@@ -1,14 +1,14 @@
- /**
-  * O domínio do LequePlay.
-  *
-  * `Midia` é uma união discriminada pelo campo `tipo`. Isso não é enfeite:
-  * é o que faz o TypeScript saber que `diretor` só existe em filme e
-  * `temporadas` só existe em série — sem cast, sem `any`, sem `!`.
-  *
-  * Os nomes daqui são os nomes que a API manda. Quando os dois lados
-  * discordavam, quem mudou foi o front: renomear um campo no TypeScript custa
-  * um `Ctrl+R`; renomear na API quebra todo mundo que já consome.
-  */
+/**
+ * O domínio do LequePlay.
+ *
+ * `Midia` é uma união discriminada pelo campo `tipo`. Isso não é enfeite:
+ * é o que faz o TypeScript saber que `diretor` só existe em filme e
+ * `temporadas` só existe em série — sem cast, sem `any`, sem `!`.
+ *
+ * Os nomes daqui são os nomes que a API manda. Quando os dois lados
+ * discordavam, quem mudou foi o front: renomear um campo no TypeScript custa
+ * um `Ctrl+R`; renomear na API quebra todo mundo que já consome.
+ */
 
 export type Genero =
   | "Ação"
@@ -38,12 +38,12 @@ type MidiaBase = {
   sinopse: string;
 
   /**
-   * A API pode não fornecer um pôster.
+   * A API omite o campo quando o título não tem pôster.
    *
-   * Quando não existe pôster, o valor pode ser `null` ou o campo pode
-   * simplesmente não existir. Por isso o campo é opcional e aceita `null`.
+   * Por isso o campo é opcional: quando não existe pôster,
+   * `posterUrl` simplesmente não vem na resposta.
    */
-  posterUrl?: string | null;
+  posterUrl?: string;
 
   /**
    * Sempre um número — a API nunca manda `null` aqui. Quem responde
@@ -215,8 +215,8 @@ export type ResumoMidia = {
   slug: string;
   titulo: string;
 
-  /** Mesmo nome e mesma regra de `Midia.posterUrl`: pode não existir ou ser null. */
-  posterUrl?: string | null;
+  /** Mesmo nome e mesma regra de `Midia.posterUrl`: o campo pode ser omitido. */
+  posterUrl?: string;
 };
 
 /** Quem escreveu, curtiu ou seguiu. */

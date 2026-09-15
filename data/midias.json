@@ -199,6 +199,7 @@
     "ano": 2025,
     "generos": ["Documentário"],
     "sinopse": "Seis comunidades ribeirinhas, seis formas de responder à mesma pergunta: o que acontece quando a água muda de lugar e ninguém avisa.",
+    "posterUrl": "/capas/onde-o-rio-vira.svg",
     "notaMedia": 8.8,
     "totalAvaliacoes": 64,
     "temporadas": [
@@ -256,26 +257,25 @@
     "ano": 2024,
     "generos": ["Tecnologia"],
     "sinopse": "Toda semana, duas pessoas leem em voz alta um trecho de código real e discutem o que fariam diferente — sem julgar quem escreveu.",
-    "posterUrl": "",
+    "posterUrl": "/capas/revisao-de-codigo.svg",
     "notaMedia": 9.3,
     "totalAvaliacoes": 512,
     "apresentador": "Rafa Okumura",
     "duracaoMin": 192,
     "totalEpisodios": 3
   },
-  {
-    "id": "8",
-    "slug": "primeira-cadeira",
-    "tipo": "podcast",
-    "titulo": "Primeira Cadeira",
-    "ano": 2025,
-    "generos": ["Drama"],
-    "sinopse": "Conversas com pessoas que mudaram de profissão depois dos trinta, sobre o intervalo entre largar uma coisa e conseguir a outra.",
-    "posterUrl": null,
-    "notaMedia": 8.6,
-    "totalAvaliacoes": 189,
-    "apresentador": "Dandara Reis",
-    "duracaoMin": 91,
-    "totalEpisodios": 2
-  }
+ {
+  "id": "8",
+  "slug": "primeira-cadeira",
+  "tipo": "podcast",
+  "titulo": "Primeira Cadeira",
+  "ano": 2025,
+  "generos": ["Drama"],
+  "sinopse": "Conversas com pessoas que mudaram de profissão depois dos trinta, sobre o intervalo entre largar uma coisa e conseguir a outra.",
+  "notaMedia": 8.6,
+  "totalAvaliacoes": 189,
+  "apresentador": "Dandara Reis",
+  "duracaoMin": 91,
+  "totalEpisodios": 2
+}
 ]
