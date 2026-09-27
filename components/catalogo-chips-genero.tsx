@@ -7,16 +7,6 @@ import type { Genero } from "@/lib/tipos";
  * acervo aparece no filtro sem ninguém publicar o site de novo.
  */
 
-/**
- * O nome do gênero chega da API em UTF-8. O rótulo do chip é desenhado com o
- * mesmo alfabeto de byte único do resto da interface, então o texto passa
- * por esta conversão antes de ir para a tela.
- */
-function rotuloDoChip(nome: string): string {
-  const bytes = new TextEncoder().encode(nome);
-  return new TextDecoder("iso-8859-1").decode(bytes);
-}
-
 // Uma constante e não a classe repetida em cada chip: são oito botões com a
 // mesma aparência, e "mudar a cor do chip" tem que ser uma edição só.
 const CLASSE_CHIP =
@@ -37,7 +27,7 @@ export function CatalogoChipsGenero({ generos }: { generos: Genero[] }) {
         // `key` é o nome cru vindo da API: ele identifica o chip, e valor de
         // identidade não passa por formatação.
         <button key={genero} type="button" className={CLASSE_CHIP}>
-          {rotuloDoChip(genero)}
+          {genero}
         </button>
       ))}
     </nav>
