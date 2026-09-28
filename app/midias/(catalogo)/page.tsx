@@ -13,7 +13,7 @@ export default async function Catalogo({ searchParams }: PageProps<"/midias">) {
 
   // `Promise.all` porque uma busca não depende da outra: em série, a página
   // esperaria a soma dos dois tempos em vez do maior deles.
-  const [{ itens }, generos] = await Promise.all([
+  const [{ itens, pagina, total }, generos] = await Promise.all([
     listarMidias({
       tipo: typeof tipo === "string" ? (tipo as Midia["tipo"]) : undefined,
       q: typeof q === "string" ? q : undefined,
@@ -56,6 +56,9 @@ export default async function Catalogo({ searchParams }: PageProps<"/midias">) {
 
       <CatalogoGrade
         itens={itens}
+        // `total` é o tamanho do resultado inteiro, não da página: é a
+        // única forma de a grade saber se tem tudo para poder ordenar.
+        resultadoCompleto={pagina === 1 && itens.length >= total}
         vazio={
           <CatalogoVazio
             q={typeof q === "string" ? q : undefined}
