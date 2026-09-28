@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
+import { formatarDuracao, rotuloDaTemporada } from "@/lib/formatadores";
 import type { Serie } from "@/lib/tipos";
 
 type Props = {
@@ -27,9 +29,13 @@ export function FichaTemporadas({
    * Por isso encontramos o índice correspondente
    * ao número recebido na URL.
    */
+  // Só o detalhe traz `temporadas` (LP-212). Sem a lista, não há seletor —
+  // o `if (!temporada)` lá embaixo devolve `null`.
+  const temporadas = serie.temporadas ?? [];
+
   const indiceEncontrado =
     temporadaNumero !== undefined
-      ? serie.temporadas.findIndex(
+      ? temporadas.findIndex(
           (temporada) =>
             temporada.numero === temporadaNumero,
         )
@@ -72,7 +78,7 @@ export function FichaTemporadas({
   }
 
   const temporada =
-    serie.temporadas[temporadaSelecionada];
+    temporadas[temporadaSelecionada];
 
   /*
    * Proteção caso a série não tenha nenhuma temporada.
@@ -127,16 +133,30 @@ export function FichaTemporadas({
           }}
           className="rounded-md border border-white/15 bg-zinc-900 px-3 py-1.5 text-sm"
         >
-          {serie.temporadas.map((temporada, indice) => (
+          {temporadas.map((temporada, indice) => (
             <option
               key={temporada.numero}
               value={indice}
             >
-              Temporada {temporada.numero} (
-              {temporada.ano})
+              {/* Sem ano, os parênteses somem junto: nada de "Temporada 4 ()". */}
+              {temporada.ano
+                ? `${rotuloDaTemporada(temporada)} (${temporada.ano})`
+                : rotuloDaTemporada(temporada)}
             </option>
           ))}
         </select>
+
+        {/*
+          O seletor troca a temporada aqui mesmo, sem sair da ficha; o link
+          leva ao endereço próprio da temporada (LP-301), que é o que se
+          compartilha e o que abre numa aba nova.
+        */}
+        <Link
+          href={`/midias/${serie.slug}/temporada/${temporada.numero}`}
+          className="text-sm font-medium text-violet-400 transition hover:text-violet-300"
+        >
+          Ver a página desta temporada
+        </Link>
       </div>
 
       {temporada.episodios.length === 0 ? (
@@ -186,7 +206,7 @@ export function FichaTemporadas({
                 )}
 
                 <span className="ml-auto text-zinc-500">
-                  {episodio.duracaoMin} min
+                  {formatarDuracao(episodio.duracaoMin)}
                 </span>
               </li>
             );
