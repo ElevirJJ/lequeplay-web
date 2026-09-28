@@ -524,3 +524,30 @@ export type Pagina<T> = {
   porPagina: number;
   total: number;
 };
+
+/* ------------------------------------------------------------------ *
+ * Busca — resultado e ranqueamento
+ * ------------------------------------------------------------------ */
+
+export type ModoBusca = "auto" | "hybrid" | "vector" | "fts";
+
+export type ItemResultadoBusca = Midia & {
+  score: number;
+  rank: number;
+};
+
+export type ItemBusca = ItemResultadoBusca;
+
+/**
+ * A resposta de `GET /v1/busca`.
+ *
+ * Não é o envelope de paginação (`Pagina<T>`): a busca tem envelope próprio,
+ * com o modo que de fato rodou, o aviso de fallback e a lista ranqueada com
+ * relevância e posição.
+ */
+export type ResultadoBusca = {
+  query: string;
+  modo: ModoBusca;
+  usouFallback: boolean;
+  itens: ItemResultadoBusca[];
+};

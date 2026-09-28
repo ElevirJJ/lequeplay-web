@@ -16,7 +16,9 @@ import type {
   Genero,
   ItemHistorico,
   Midia,
+  ModoBusca,
   Pagina,
+  ResultadoBusca,
   TokensDaSessao,
   UsuarioDaSessao,
 } from "@/lib/tipos";
@@ -387,6 +389,73 @@ export const listarMidias = cache(async function listarMidias(
     revalidar: 3600,
   });
 });
+
+export type ParametrosBusca = {
+  q: string;
+  modo?: ModoBusca;
+};
+
+/**
+ * A busca de títulos no catálogo (`GET /v1/busca`).
+ *
+ * Diferente da listagem, esta rota passa pelo motor de busca da API (textual,
+ * vetorial ou híbrido) e devolve a resposta no envelope `ResultadoBusca`, com
+ * ranqueamento e indicação de fallback léxico quando a IA não respondeu.
+ *
+ * Com `USAR_MOCK=true`, ela pesquisa em `data/midias.json` casando palavras no
+ * título ou na sinopse (case-insensitive) e devolve honestamente `modo: "fts"`
+ * e `usouFallback: true`, sem fingir inteligência que o mock não tem (LP-608).
+ */
+export const buscarMidias = cache(async function buscarMidias(
+  consultaOuParametros: string | ParametrosBusca,
+  modoParam?: ModoBusca,
+): Promise<ResultadoBusca> {
+  const q =
+    typeof consultaOuParametros === "string"
+      ? consultaOuParametros
+      : consultaOuParametros.q;
+  const modo =
+    typeof consultaOuParametros === "string"
+      ? modoParam
+      : (consultaOuParametros.modo ?? modoParam);
+
+  if (USAR_MOCK) {
+    const todas = await doMock();
+    const termo = q.trim().toLowerCase();
+
+    const midiasFiltradas = termo
+      ? todas.filter((m) => {
+          const tituloMatch = m.titulo.toLowerCase().includes(termo);
+          const sinopseMatch =
+            m.sinopse?.toLowerCase().includes(termo) ?? false;
+          return tituloMatch || sinopseMatch;
+        })
+      : [];
+
+    return {
+      modo: "fts",
+      usouFallback: true,
+      query: q,
+      itens: midiasFiltradas.map((m, i) => ({
+        ...m,
+        score: 1,
+        rank: i + 1,
+      })),
+    };
+  }
+
+  const params = new URLSearchParams({ q });
+  if (modo) {
+    params.set("modo", modo);
+  }
+
+  return buscar<ResultadoBusca>(`/busca?${params}`, {
+    tags: [CACHE_TAGS.MIDIAS],
+    revalidar: 3600,
+  });
+});
+
+export const buscarNoCatalogo = buscarMidias;
 
 export const buscarMidia = cache(async (slug: string): Promise<Midia | null> => {
 
