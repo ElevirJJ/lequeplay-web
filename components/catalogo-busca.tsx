@@ -29,7 +29,6 @@ export function CatalogoBusca({ consulta }: Props) {
     <form
       role="search"
       onSubmit={buscar}
-      aria-busy={estaBuscando}
       className="mt-6 flex flex-wrap items-center gap-2"
     >
       <label htmlFor="q" className="sr-only">
@@ -49,11 +48,12 @@ export function CatalogoBusca({ consulta }: Props) {
       >
         Buscar
       </button>
-      {estaBuscando ? (
-        <p role="status" aria-live="polite" className="text-sm text-zinc-400">
-          Buscando...
-        </p>
-      ) : null}
+      {/* A região existe desde o primeiro render, vazia, e só o texto muda.
+          Leitor de tela anuncia mudança numa região que ele já conhece; uma
+          região que nasce com o texto pronto pode passar em silêncio. */}
+      <p role="status" className="text-sm text-zinc-400">
+        {estaBuscando ? "Buscando…" : null}
+      </p>
     </form>
   );
 }
