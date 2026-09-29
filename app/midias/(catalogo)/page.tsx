@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CatalogoBusca } from "@/components/catalogo-busca";
 import { CatalogoChipsGenero } from "@/components/catalogo-chips-genero";
 import { CatalogoGrade } from "@/components/catalogo-grade";
 import { CatalogoVazio } from "@/components/catalogo-vazio";
@@ -32,25 +33,7 @@ export default async function Catalogo({ searchParams }: PageProps<"/midias">) {
         exato, no cliente da API. Fazer ela entender intenção é o ticket da
         sprint 6.
       */}
-      <form role="search" className="mt-6 flex flex-wrap gap-2">
-        <label htmlFor="q" className="sr-only">
-          Buscar no catálogo
-        </label>
-        <input
-          id="q"
-          name="q"
-          type="search"
-          defaultValue={typeof q === "string" ? q : ""}
-          placeholder="Buscar por título"
-          className="min-w-64 flex-1 rounded-md border border-white/15 bg-zinc-900 px-3 py-2 text-base placeholder:text-zinc-600"
-        />
-        <button
-          type="submit"
-          className="rounded-md bg-violet-600 px-4 py-2 font-medium text-white transition hover:bg-violet-500"
-        >
-          Buscar
-        </button>
-      </form>
+      <CatalogoBusca consulta={typeof q === "string" ? q : ""} />
 
       <CatalogoChipsGenero generos={generos} />
 
