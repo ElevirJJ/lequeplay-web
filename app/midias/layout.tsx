@@ -1,12 +1,11 @@
-import React from "react";
-
+/**
+ * O layout de `/midias` com a fatia `@modal` (LP-508): a ficha aberta a partir
+ * do catálogo aparece por cima da grade, sem desmontá-la.
+ */
 export default function LayoutDasMidias({
   children,
   modal,
-}: {
-  children: React.ReactNode;
-  modal: React.ReactNode;
-}) {
+}: LayoutProps<"/midias">) {
   return (
     <>
       {children}
