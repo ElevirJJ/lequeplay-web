@@ -12,19 +12,23 @@ A ementa do curso e o desenho conceitual do produto estabelecem uma hierarquia c
 
 $$\text{Mídia (Série)} \longrightarrow \text{Temporada} \longrightarrow \text{Episódio}$$
 
-No entanto, ao confrontar a especificação com a implementação real da API (`lequeplay-api`), verificou-se que o backend publica no detalhe da série (`GET /v1/midias/{slug}`) apenas o resumo das temporadas:
+No entanto, ao confrontar a especificação com a implementação real da API (`lequeplay-api`), verificou-se que o backend publica no detalhe da série (`GET /v1/midias/{slug}`) apenas o resumo das temporadas. É o schema `Temporada` da documentação publicada (https://api.lequeplay.rodolfodebonis.com.br/docs):
 
-```ts
-export type ResumoTemporada = {
-  numero: number;
-  ano: number;
-  totalEpisodios: number;
-};
+```yaml
+Temporada:
+  properties:
+    numero: { type: integer }
+    nome: { type: string }
+    ano: { type: integer }
+    totalEpisodios: { type: integer }
+  required: [numero, totalEpisodios]
 ```
+
+`nome` e `ano` podem faltar (LP-305), e a chave `episodios` não existe: ela nem aparece na resposta. As rotas publicadas são `/v1/generos`, `/v1/midias`, `/v1/midias/{id}`, `/v1/busca`, `/v1/catalogo/versao` e as de autenticação — não há rota de temporada.
 
 A API real **não envia o array detalhado de episódios** dentro de cada temporada. O endpoint dedicado `GET /v1/midias/{slug}/temporadas/{numero}` consta no [contrato da API](../api-contrato.md) marcado como `❓ A confirmar`, ainda pendente de desenvolvimento na API em Go.
 
-Além disso, títulos sem dados de episódios na origem (como *Mapa das Marés* no acervo) chegam com `episodios: []`.
+Só o mock (`data/midias.json`) traz a lista de episódios; ali, *Mapa das Marés* tem uma temporada com `episodios: []` e `totalEpisodios: 0`. Com a API, a chave simplesmente não vem.
 
 ---
 
@@ -40,19 +44,9 @@ Diante da ausência do payload de episódios na API pública, foram avaliadas tr
 
 - **Integridade dos dados:** O front-end não deve inventar dados nem mentir para quem usa o sistema. Gerar episódios genéricos ("Episódio 1", "Episódio 2") transmitiria uma falsa precisão e causaria inconsistência quando a API passasse a fornecer os dados reais (títulos verdadeiros, durações específicas e sinopses).
 - **Sem rotas órfãs:** Criar rotas `/episodio/[n]` sem um identificador estável ou endpoint correspondente geraria URLs quebradas, problemas de indexação e complexidade de manutenção desnecessária.
-- **Transparência e acessibilidade:** A página da temporada ([`app/midias/[slug]/temporada/[numero]/page.tsx`](../../app/midias/[slug]/temporada/[numero]/page.tsx)) e o seletor da ficha ([`components/ficha-temporadas.tsx`](../../components/ficha-temporadas.tsx)) já implementam o tratamento:
-  ```tsx
-  {temporada.episodios.length === 0 ? (
-    <p className="mt-8 text-sm text-zinc-500">
-      Os episódios desta temporada ainda não foram anunciados.
-    </p>
-  ) : (
-    <ol className="mt-8 divide-y divide-white/10 border-y border-white/10">
-      {/* lista de episódios reais */}
-    </ol>
-  )}
-  ```
-  Quando os episódios não vêm da API, a tela exibe o cabeçalho completo da temporada e a mensagem amigável, garantindo que o leitor de tela e a pessoa usuária compreendam o status da produção em vez de se depararem com uma lista vazia sem explicação.
+- **Transparência e acessibilidade:** o tipo diz a verdade — `episodios?: Episodio[]` em `lib/tipos.ts` —, e o compilador cobra a ausência de quem lê. A página da temporada ([`app/midias/[slug]/temporada/[numero]/page.tsx`](../../app/midias/[slug]/temporada/[numero]/page.tsx)) e o seletor da ficha ([`components/ficha-temporadas.tsx`](../../components/ficha-temporadas.tsx)) leem `temporada.episodios ?? []`. Sem a lista, a tela mostra número, ano e total, e diz "N episódios — a lista ainda não está disponível". "Os episódios desta temporada ainda não foram anunciados" fica só para `totalEpisodios: 0`, que é o único caso em que a frase é verdade.
+
+  Antes desta decisão, a ficha fazia `temporada.episodios.length`, e com `USAR_MOCK=false` toda série respondia 500 (`Cannot read properties of undefined`).
 
 ---
 
@@ -110,7 +104,8 @@ export type Episodio = {
 
 export type TemporadaCompleta = {
   numero: number;
-  ano: number;
+  nome?: string;
+  ano?: number;
   totalEpisodios: number;
   episodios: Episodio[];
 };
