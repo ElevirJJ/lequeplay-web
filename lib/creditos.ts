@@ -1,9 +1,19 @@
 import type { Filme, Podcast } from "@/lib/tipos";
 
-/** Deriva o nome da pessoa que dirige um filme a partir dos créditos. */
-export function obterDiretor(midia: Filme): string {
-  const credito = midia.creditos?.find((c) => c.papel === "direcao");
-  return credito?.pessoa.nome ?? midia.diretor ?? "";
+/**
+ * Deriva quem dirige um filme a partir de `creditos` (papel `"direcao"`).
+ *
+ * Todos os nomes: a API grava um crédito por pessoa, e um filme dirigido a
+ * quatro mãos chega com dois. `undefined` quando não há nenhum, para quem
+ * mostra esconder o rótulo junto, em vez de escrever "Direção" sem nome
+ * (LP-205). O `diretor` solto só existe no mock; a API não manda.
+ */
+export function obterDiretor(midia: Filme): string | undefined {
+  const nomes = (midia.creditos ?? [])
+    .filter((c) => c.papel === "direcao")
+    .map((c) => c.pessoa.nome);
+
+  return nomes.length > 0 ? nomes.join(", ") : midia.diretor;
 }
 
 /**
