@@ -14,17 +14,16 @@
     "duracaoMin": 118,
     "creditos": [
       {
-        "pessoa": { "slug": "marina-aleixo", "nome": "Marina Aleixo", "fotoUrl": null },
-        "papel": "direcao",
-        "personagem": null
+        "pessoa": { "slug": "marina-aleixo", "nome": "Marina Aleixo" },
+        "papel": "direcao"
       },
       {
-        "pessoa": { "slug": "bia-nogueira", "nome": "Bia Nogueira", "fotoUrl": null },
+        "pessoa": { "slug": "bia-nogueira", "nome": "Bia Nogueira" },
         "papel": "elenco",
         "personagem": "Lia"
       },
       {
-        "pessoa": { "slug": "raul-mendes", "nome": "Raul Mendes", "fotoUrl": null },
+        "pessoa": { "slug": "raul-mendes", "nome": "Raul Mendes" },
         "papel": "elenco",
         "personagem": "Tomás"
       }
@@ -45,17 +44,16 @@
     "duracaoMin": 104,
     "creditos": [
       {
-        "pessoa": { "slug": "caio-bertoni", "nome": "Caio Bertoni", "fotoUrl": null },
-        "papel": "direcao",
-        "personagem": null
+        "pessoa": { "slug": "caio-bertoni", "nome": "Caio Bertoni" },
+        "papel": "direcao"
       },
       {
-        "pessoa": { "slug": "lara-souza", "nome": "Lara Souza", "fotoUrl": null },
+        "pessoa": { "slug": "lara-souza", "nome": "Lara Souza" },
         "papel": "elenco",
         "personagem": "Nina"
       },
       {
-        "pessoa": { "slug": "danilo-reis", "nome": "Danilo Reis", "fotoUrl": null },
+        "pessoa": { "slug": "danilo-reis", "nome": "Danilo Reis" },
         "papel": "elenco",
         "personagem": "Otávio"
       }
@@ -72,21 +70,15 @@
     "posterUrl": "/capas/quintal-de-inverno.svg",
     "notaMedia": 0,
     "totalAvaliacoes": 0,
-    "diretor": "Lúcia Ferraz",
     "duracaoMin": 96,
     "creditos": [
       {
-        "pessoa": { "slug": "lucia-ferraz", "nome": "Lúcia Ferraz", "fotoUrl": null },
-        "papel": "direcao",
-        "personagem": null
-      },
-      {
-        "pessoa": { "slug": "nara-lima", "nome": "Nara Lima", "fotoUrl": null },
+        "pessoa": { "slug": "nara-lima", "nome": "Nara Lima" },
         "papel": "elenco",
         "personagem": "Helena"
       },
       {
-        "pessoa": { "slug": "joao-vaz", "nome": "João Vaz", "fotoUrl": null },
+        "pessoa": { "slug": "joao-vaz", "nome": "João Vaz" },
         "papel": "elenco",
         "personagem": "Pedro"
       }
