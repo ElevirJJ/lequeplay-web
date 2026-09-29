@@ -1,7 +1,7 @@
-"use client"; // este arquivo é client: tem estado e handlers
+"use client"; // este arquivo é client: lê a URL e tem handlers
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { CardMidia } from "@/components/card-midia";
+import { AcervoGrade } from "@/components/acervo-grade";
 import type { ItemHistorico, Midia } from "@/lib/tipos";
 
 const FILTRO_NAO_VISTOS = "nao-vistos";
@@ -66,13 +66,7 @@ export function AcervoFiltravel({ itens, historico }: Props) {
         </label>
       </div>
 
-      <ul className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
-        {visiveis.map((midia) => (
-          <li key={midia.id}>
-            <CardMidia midia={midia} />
-          </li>
-        ))}
-      </ul>
+      <AcervoGrade itens={visiveis} />
     </>
   );
 }
