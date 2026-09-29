@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { formatarDuracao } from "@/lib/formatadores";
+import { formatarDuracao, rotuloDaTemporada } from "@/lib/formatadores";
 import type { Serie } from "@/lib/tipos";
 
 type Props = {
@@ -29,9 +29,13 @@ export function FichaTemporadas({
    * Por isso encontramos o índice correspondente
    * ao número recebido na URL.
    */
+  // Só o detalhe traz `temporadas` (LP-212). Sem a lista, não há seletor —
+  // o `if (!temporada)` lá embaixo devolve `null`.
+  const temporadas = serie.temporadas ?? [];
+
   const indiceEncontrado =
     temporadaNumero !== undefined
-      ? serie.temporadas.findIndex(
+      ? temporadas.findIndex(
           (temporada) =>
             temporada.numero === temporadaNumero,
         )
@@ -74,7 +78,7 @@ export function FichaTemporadas({
   }
 
   const temporada =
-    serie.temporadas[temporadaSelecionada];
+    temporadas[temporadaSelecionada];
 
   /*
    * Proteção caso a série não tenha nenhuma temporada.
@@ -82,6 +86,10 @@ export function FichaTemporadas({
   if (!temporada) {
     return null;
   }
+
+  // A API publicada não manda `episodios` (LP-306): sem a lista, a seção cai
+  // no estado vazio em vez de quebrar a ficha com `.length` de `undefined`.
+  const episodios = temporada.episodios ?? [];
 
   /*
    * O episódio que veio pelo "Retomar" só é ESTE episódio se a temporada
@@ -129,13 +137,15 @@ export function FichaTemporadas({
           }}
           className="rounded-md border border-white/15 bg-zinc-900 px-3 py-1.5 text-sm"
         >
-          {serie.temporadas.map((temporada, indice) => (
+          {temporadas.map((temporada, indice) => (
             <option
               key={temporada.numero}
               value={indice}
             >
-              Temporada {temporada.numero} (
-              {temporada.ano})
+              {/* Sem ano, os parênteses somem junto: nada de "Temporada 4 ()". */}
+              {temporada.ano
+                ? `${rotuloDaTemporada(temporada)} (${temporada.ano})`
+                : rotuloDaTemporada(temporada)}
             </option>
           ))}
         </select>
@@ -153,14 +163,20 @@ export function FichaTemporadas({
         </Link>
       </div>
 
-      {temporada.episodios.length === 0 ? (
+      {episodios.length === 0 ? (
         <p className="text-sm text-zinc-500">
-          Os episódios desta temporada ainda não foram
-          anunciados.
+          {/*
+            "Não anunciados" só é verdade com `totalEpisodios: 0`. Com a API,
+            toda temporada chega sem a lista, e dizer "não anunciados" de uma
+            temporada de 8 episódios é afirmar o que a própria API desmente.
+          */}
+          {temporada.totalEpisodios === 0
+            ? "Os episódios desta temporada ainda não foram anunciados."
+            : `${temporada.totalEpisodios} ${temporada.totalEpisodios === 1 ? "episódio" : "episódios"} — a lista ainda não está disponível.`}
         </p>
       ) : (
         <ol className="divide-y divide-white/10 border-y border-white/10">
-          {temporada.episodios.map((episodio) => {
+          {episodios.map((episodio) => {
             const selecionado = ehOEpisodioDoRetomar(
               episodio.numero,
             );
