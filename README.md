@@ -54,6 +54,8 @@ lib/
   api.ts                ⭐ TODO acesso à API passa por aqui
 docs/
   api-contrato.md       ⭐ o contrato com o backend — leia antes de codar
+  medicao-chamadas-api.md ⭐ como auditar e medir chamadas à API e cache por visita
+  server-actions-seguranca.md  o que o Next garante e o que é seu
 data/midias.json        catálogo de mentira, usado quando USAR_MOCK=true
 public/capas/           imagens
 ```
@@ -74,6 +76,81 @@ O contrato está em [`docs/api-contrato.md`](docs/api-contrato.md): endpoints,
 formato de erro, paginação e os casos de borda que ela produz de propósito —
 título sem nota, título sem capa, busca sem resultado. **É a primeira leitura
 de quem chega.**
+
+### Quanto tempo uma mudança no catálogo leva para aparecer
+
+**No pior caso, uma hora.** É o `revalidate` de 3600 segundos que o
+`lib/api.ts` usa no catálogo, na ficha e nos gêneros.
+
+Mas esse é o **teto**, não o normal. O caminho normal é a invalidação sob
+demanda: a API incrementa `GET /v1/catalogo/versao` a cada ingestão, e o vigia
+(`POST /api/vigia-do-catalogo`) compara com a última versão que viu e solta a
+etiqueta `midias` quando ela muda. Com o vigia rodando de cinco em cinco
+minutos, a mudança aparece em cinco minutos; a hora só entra em cena se ele
+estiver parado.
+
+Uma leitura que confunde muita gente: `revalidate: 3600` promete *"não busco
+de novo antes de uma hora"*, e **não** *"o que você vê tem no máximo uma
+hora"*. Se ninguém visitar a página por um dia, o que está guardado tem um
+dia.
+
+O esquema das etiquetas está em [`docs/cache-tags.md`](docs/cache-tags.md).
+Quando alguma coisa "continua velha", o caminho para achar a camada — com as
+provas medidas neste projeto — está em
+[`docs/eu-revalidei-e-continua-velho.md`](docs/eu-revalidei-e-continua-velho.md).
+Resposta de uma pessoa nunca entra em cache compartilhado — quem trabalha com
+sessão deve ler também o documento da próxima seção.
+Dado de uma pessoa — o histórico — nunca é cacheado: toda chamada com o token
+dela sai pelo `buscarComToken`, que é sempre `no-store` (LP-411). A versão do
+catálogo também nunca é, porque um vigia que lê valor guardado não vigia nada.
+
+---
+
+## Conta e sessão
+
+O login troca usuário e senha por dois tokens, que moram em cookies
+`httpOnly` — o JavaScript da página não os enxerga. Quem confere se a sessão
+vale é o servidor, perguntando à API a cada renderização (`lib/dal.ts`), e não
+o cookie em si: cookie qualquer pessoa escreve no console.
+
+### Não existe cadastro
+
+A API não tem rota para criar conta — `/v1/auth/cadastro`, `/registro` e
+`/register` respondem 404. As contas são criadas no Keycloak por quem
+administra o LequePlay, e é com essa pessoa que se pede um acesso. A tela de
+entrar diz isso, em vez de oferecer um "Criar conta" que não leva a lugar
+nenhum.
+
+### Entrar em desenvolvimento, sem conta de verdade
+
+O contador de chamadas publicado no card da aula 04 (`scripts/contador-api.mjs`,
+com a versão mais nova no card da aula 06) fica entre o front e a API e, com
+`AUTH=simulada`, responde ele mesmo as rotas `/v1/auth/*` — com os mesmos
+campos, os mesmos status e o mesmo `problem+json` da API publicada. O resto
+ele repassa para a API de verdade.
+
+```bash
+AUTH=simulada node scripts/contador-api.mjs   # terminal 1
+npm run dev                                   # terminal 2
+```
+
+```bash
+# .env.local
+USAR_MOCK=false
+API_URL=http://localhost:4000/v1
+```
+
+Qualquer usuário entra com a senha `senha-de-laboratorio`. O token é de
+mentira — a API publicada recusaria —, então isto serve para desenvolver as
+telas de conta, e não para falar com rotas protegidas de verdade.
+`EXPIRA=20` faz o token vencer em 20 segundos, para testar a renovação.
+
+**Antes de escrever uma Server Action, leia
+[`docs/server-actions-seguranca.md`](docs/server-actions-seguranca.md).** Action
+parece função e é endereço público: qualquer um manda o mesmo POST, com o corpo
+que quiser, sem passar pela sua tela. O documento separa, com os números
+medidos no projeto, o que o framework já garante do que continua sendo
+trabalho seu.
 
 ---
 
@@ -158,7 +235,9 @@ gosto parecido.
 
 **Ter uma conta**
 
-- Não há **login** nem perfil, então nada abaixo daqui é possível ainda.
+- Dá para **entrar** e ver o próprio **perfil**, mas não há **cadastro**: as
+  contas são criadas por quem administra (veja "Conta e sessão"). O resto
+  desta lista ainda não existe.
 
 **Registrar e escrever**
 

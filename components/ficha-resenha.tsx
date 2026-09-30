@@ -1,15 +1,72 @@
+import Link from "next/link";
+import { FichaResenhaCampo } from "@/components/ficha-resenha-campo";
+import { buscarUsuarioLogado } from "@/lib/dal";
 
 /**
- * O tamanho máximo do texto da resenha.
+ * O bloco da resenha, que agora sabe se há alguém logado — e continua sem
+ * prometer o que a API não faz.
  *
- * O contador embaixo do campo e a validação antes de enviar precisam do
- * mesmo número — dois literais iguais em dois arquivos viram, com o tempo,
- * dois números diferentes.
+ * ## O endpoint não existe, e isso é medido
+ *
+ * Na API publicada, hoje:
+ *
+ * ```
+ * GET /v1/midias/{id}          -> 200
+ * GET /v1/midias/{id}/resenha  -> 404 page not found
+ * ```
+ *
+ * O roteador da API (`internal/catalog/handler.go`) declara `/v1/midias`,
+ * `/v1/midias/{id}`, `/v1/busca`, `/v1/generos` e `/v1/catalogo/versao`. Nada
+ * de resenha — e o `openapi.yaml` também não a menciona. O contrato do time
+ * marca a camada social como 🕓 **combinado**, não realidade.
+ *
+ * Por isso **não** existe Server Action de publicar aqui. Escrever uma que
+ * chama um endereço inexistente entregaria um botão que falha no clique — e
+ * um botão que falha é pior do que um botão desligado com uma frase honesta.
+ *
+ * ## O que a conta muda, então
+ *
+ * Só quem vê o quê:
+ *
+ * - **sem sessão:** um convite para entrar, com o caminho de volta para esta
+ *   ficha;
+ * - **com sessão:** o campo de escrever, e a verdade de que publicar ainda
+ *   não existe.
  */
-const MAXIMO_DE_CARACTERES = 280;
+export async function FichaResenha({
+  titulo,
+  slug,
+}: {
+  titulo: string;
+  slug: string;
+}) {
+  const usuario = await buscarUsuarioLogado();
 
-export function FichaResenha({ titulo }: { titulo: string }) {
-  const escritos = 0;
+  if (!usuario) {
+    return (
+      <section aria-labelledby="resenha" className="mt-12">
+        <h2 id="resenha" className="mb-3 text-xl font-semibold">
+          Sua resenha
+        </h2>
+
+        <p className="text-sm text-zinc-400">
+          Entre para escrever uma resenha sobre {titulo}.
+        </p>
+
+        {/*
+          O `de` traz a pessoa de volta para esta ficha depois do login. Quem
+          confere esse destino é o filtro do LP-407: aqui ele é escrito por
+          nós, mas lá chega como texto de estranho.
+        */}
+        <Link
+          href={`/entrar?de=${encodeURIComponent(`/midias/${slug}`)}`}
+          className="mt-3 inline-block rounded-full bg-violet-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500"
+        >
+          Entrar
+        </Link>
+      </section>
+    );
+  }
 
   return (
     <section aria-labelledby="resenha" className="mt-12">
@@ -21,34 +78,12 @@ export function FichaResenha({ titulo }: { titulo: string }) {
         O que você achou de {titulo}?
       </label>
 
-      <textarea
-        id="texto"
-        name="texto"
-        rows={5}
-        maxLength={MAXIMO_DE_CARACTERES}
-        placeholder="Sem spoiler, por favor."
-        className="mt-2 block w-full max-w-prose rounded-md border border-white/15 bg-zinc-900 px-3 py-2 text-base placeholder:text-zinc-600"
-      />
-
-      {/* 
-        `aria-live="polite"` porque o contador muda enquanto a pessoa digita:
-        sem ele, quem usa leitor de tela só descobre que estourou o limite
-        quando o campo para de aceitar letra.
-      */}
-      <p className="mt-1 text-sm text-zinc-500" aria-live="polite">
-        {escritos}/{MAXIMO_DE_CARACTERES} caracteres
-      </p>
+      <FichaResenhaCampo />
 
       {/*
-        Decisão registrada no LP-511:
-        manter o botão desabilitado enquanto a API não disponibilizar
-        o endpoint oficial para publicação de resenhas.
-
-        Não habilitar o botão com uma rota inventada evita que a tela
-        prometa uma funcionalidade que o contrato atual da API não oferece.
-
-        Quando o endpoint oficial existir, remover esta explicação e
-        conectar o botão ao contrato disponibilizado pela API.
+        Continua desabilitado, agora com o motivo escrito na tela. A conta
+        existe, a vontade existe, o endereço para onde mandar é que não —
+        conferido: a rota responde 404 na API publicada.
       */}
       <button
         type="button"
@@ -59,10 +94,9 @@ export function FichaResenha({ titulo }: { titulo: string }) {
       </button>
 
       <p className="mt-2 text-sm text-zinc-500">
-        A publicação de resenhas estará disponível quando a API disponibilizar
-        esse recurso.
+        Você está logado, mas publicar resenha ainda não existe na API — o que
+        você escrever aqui não será salvo. Estamos esperando o endpoint.
       </p>
     </section>
   );
 }
-

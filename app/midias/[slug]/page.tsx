@@ -1,35 +1,64 @@
-import type { Metadata } from "next";
-import Image from "next/image";
+import type { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CabecalhoDaMidia } from "@/components/cabecalho-da-midia";
 import { FichaAbas } from "@/components/ficha-abas";
 import { FichaCompartilhar } from "@/components/ficha-compartilhar";
+import { FichaMarcarAssistida } from "@/components/ficha-marcar-assistida";
+import { FichaPodcast } from "@/components/ficha-podcast";
 import { FichaResenha } from "@/components/ficha-resenha";
-import { FichaSinopse } from "@/components/ficha-sinopse";
 import { FichaTemporadas } from "@/components/ficha-temporadas";
 import { buscarMidia } from "@/lib/api";
+import { listarAssistidas } from "@/lib/assistidas";
+import { corte } from "@/lib/utils";
 
 type SearchParams = {
   temporada?: string;
   episodio?: string;
+  episodios?: string;
 };
 
-export async function generateMetadata({
-  params,
-}: PageProps<"/midias/[slug]">): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps<"/midias/[slug]">,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { slug } = await params;
 
   const midia = await buscarMidia(slug);
 
   if (!midia) {
     return {
-      title: "Título não encontrado",
+      title: "Mídia não encontrada",
+      description: "A mídia solicitada não existe no catálogo.",
     };
   }
 
+  // O mesmo corte da sinopse que a ficha usa na tela: o resumo lido na página
+  // e o que aparece na prévia do link são o mesmo texto, então cortam no mesmo
+  // lugar — no espaço, nunca no meio da palavra. As reticências são o caractere
+  // `…`, e não três pontos seguidos.
+  //
+  // Sem sinopse — a API manda `the-odyssey` assim —, vale a descrição do site,
+  // do `app/layout.tsx`. Ela é lida pelo `parent`, e não simplesmente omitida:
+  // o merge de metadata é raso, e o `openGraph` daqui substitui o do layout
+  // inteiro — a prévia do link sairia sem descrição nenhuma.
+  const sinopse = midia.sinopse ?? "";
+  const pontoDoCorte = corte(sinopse);
+  const descricaoCurta = !sinopse
+    ? ((await parent).description ?? undefined)
+    : pontoDoCorte < sinopse.length
+      ? `${sinopse.slice(0, pontoDoCorte).trimEnd()}…`
+      : sinopse;
+
   return {
     title: midia.titulo,
-    description: midia.sinopse,
+    description: descricaoCurta,
+    openGraph: {
+      title: midia.titulo,
+      description: descricaoCurta,
+      siteName: "LequePlay",
+      type: "article",
+    },
   };
 }
 
@@ -54,6 +83,8 @@ export default async function PaginaDaMidia({
     notFound();
   }
 
+  const jaFoiAssistida = (await listarAssistidas()).includes(midia.slug);
+
   /*
    * O botão "Retomar" envia temporada e episódio
    * pela query string.
@@ -70,6 +101,8 @@ export default async function PaginaDaMidia({
     ? Number(parametros.episodio)
     : undefined;
 
+  const mostrarTodosEpisodios = parametros?.episodios === "todos";
+
   return (
     <article>
       <nav
@@ -84,45 +117,44 @@ export default async function PaginaDaMidia({
         </Link>
       </nav>
 
-      <div className="grid gap-8 sm:grid-cols-[240px_1fr]">
-        <Image
-          src={
-            midia.posterUrl ??
-            "/capas/sem-capa.svg"
-          }
-          alt=""
-          width={300}
-          height={450}
-          className="w-full rounded-lg border border-white/10"
-          priority
+      {/*
+        O "já assisti" entra como filho do cabeçalho, e não dentro dele: o
+        mesmo cabeçalho é usado pelo layout das temporadas, que é pré-gerado
+        no build (LP-303) e deixaria de ser se lesse cookie. Quem lê o cookie
+        é esta página, que já é dinâmica.
+      */}
+      <CabecalhoDaMidia midia={midia}>
+        {/*
+          O servidor lê o cookie e manda o estado real; o botão desenha o
+          otimista por cima dele enquanto a action roda (LP-506).
+        */}
+        <FichaMarcarAssistida slug={midia.slug} assistida={jaFoiAssistida} />
+      </CabecalhoDaMidia>
+
+      {midia.tipo === "podcast" ? (
+        <FichaPodcast
+          podcast={midia}
+          mostrarTodosEpisodios={mostrarTodosEpisodios}
         />
+      ) : (
+        <>
+          <FichaAbas midia={midia} />
 
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            {midia.titulo}
-          </h1>
-
-          <p className="mt-2 text-sm text-zinc-500">
-            {midia.totalAvaliacoes === 0
-              ? "Ainda sem avaliações"
-              : `★ ${midia.notaMedia.toFixed(1)} · ${midia.totalAvaliacoes} avaliações`}
-          </p>
-
-          <FichaSinopse midia={midia} />
-        </div>
-      </div>
-
-      <FichaAbas midia={midia} />
-
-      {midia.tipo === "serie" && (
-        <FichaTemporadas
-          serie={midia}
-          temporadaNumero={temporadaNumero}
-          episodioNumero={episodioNumero}
-        />
+          {midia.tipo === "serie" && (
+            <FichaTemporadas
+              serie={midia}
+              temporadaNumero={temporadaNumero}
+              episodioNumero={episodioNumero}
+            />
+          )}
+        </>
       )}
 
-      <FichaResenha titulo={midia.titulo} />
+      {/*
+        O slug vai junto porque, sem sessão, o bloco oferece o login com o
+        caminho de volta para esta ficha (`?de=/midias/<slug>`).
+      */}
+      <FichaResenha titulo={midia.titulo} slug={midia.slug} />
 
       <FichaCompartilhar
         slug={midia.slug}

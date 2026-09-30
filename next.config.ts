@@ -2,39 +2,24 @@ import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-
- // Sem isto, o Turbopack sobe a árvore procurando lockfile e pode achar um
-
- // package-lock.json perdido na sua pasta de usuário — aí ele trata a home
-
- // inteira como raiz do projeto e avisa a cada build. Fixar a raiz aqui
-
- // resolve na sua máquina e na de todo mundo.
-
-
-
- turbopack: {
-
- root: path.resolve(import.meta.dirname),
-
-},
-
- images: {
- remotePatterns: [
-
- {
- protocol: "https",
- hostname: "image.tmdb.org",
-},
- ],
- },
-
+  turbopack: {
+    root: path.resolve(import.meta.dirname),
+  },
+  // Imprime cada chamada a fetch() no terminal em desenvolvimento,
+  // exibindo a URL completa e o status de cache (HIT, MISS, SKIP).
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },  
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "image.tmdb.org",
+      },
+    ],
+  },
 };
-
-
-
-
-
-
 
 export default nextConfig;

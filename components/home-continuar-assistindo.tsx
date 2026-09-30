@@ -1,11 +1,14 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
+import { CapaMidia } from "@/components/capa-midia";
+import {
+  itensDoHistorico,
+  useHistoricoDaPessoa,
+} from "@/components/historico-da-pessoa";
 import type { ItemHistorico, Midia } from "@/lib/tipos";
 
 type Props = {
-  /** As linhas do player: onde a pessoa parou em cada título que começou. */
-  historico: ItemHistorico[];
-
   /** O catálogo, para casar cada linha com capa, título e duração. */
   itens: Midia[];
 };
@@ -38,11 +41,13 @@ function duracaoEmSegundos(
      * protocolo-aberto tem temporada 0 (especiais),
      * e ali os dois não coincidem.
      */
-    const temporada = midia.temporadas.find(
+    // A listagem nunca traz `temporadas` (LP-212): sem elas, não há como
+    // achar o episódio, e o caso cai no mesmo `null` de episódio sumido.
+    const temporada = midia.temporadas?.find(
       (t) => t.numero === item.temporadaNumero,
     );
 
-    const episodio = temporada?.episodios.find(
+    const episodio = temporada?.episodios?.find(
       (e) => e.numero === item.episodioNumero,
     );
 
@@ -115,7 +120,36 @@ function rotuloDoEpisodio(
   return `T${item.temporadaNumero} · E${item.episodioNumero}`;
 }
 
-export function HomeContinuarAssistindo({ historico,  itens, }: Props) {
+/**
+ * A faixa é client desde o LP-414: o histórico é de uma pessoa, e chega pelo
+ * navegador dela (`/api/historico`), para a home continuar pré-gerada.
+ */
+export function HomeContinuarAssistindo({ itens }: Props) {
+  const estado = useHistoricoDaPessoa();
+
+  /*
+   * Quem entrou, numa API que ainda não guarda progresso
+   * (`/v1/perfil/historico` responde 404): a faixa diz isso, em vez de sumir
+   * ou de mostrar o histórico do mock como se fosse dela.
+   */
+  if (estado.estado === "indisponivel") {
+    return (
+      <section aria-labelledby="continuar" className="mb-14">
+        <h2 id="continuar" className="mb-2 text-xl font-semibold">
+          Continuar assistindo
+        </h2>
+        <p className="text-sm text-zinc-500">
+          O LequePlay ainda não guarda onde você parou. Quando guardar, o que
+          você começou a ver aparece aqui.
+        </p>
+      </section>
+    );
+  }
+
+  // Sem sessão, carregando ou com erro: a faixa não aparece, e o resto da
+  // home segue — uma faixa que falha não derruba a página.
+  const historico = itensDoHistorico(estado);
+
   /*
    * Junta cada item do histórico com a mídia correspondente
    * no catálogo.
@@ -194,14 +228,8 @@ export function HomeContinuarAssistindo({ historico,  itens, }: Props) {
               key={`${item.midiaSlug}-${item.temporadaNumero ?? ""}-${item.episodioNumero ?? ""}`}
               className="flex gap-4 rounded-lg border border-white/10 bg-zinc-900/40 p-3"
             >
-              <Image
-                src={
-                  midia.posterUrl ??
-                  "/capas/sem-capa.svg"
-                }
-                alt=""
-                width={300}
-                height={450}
+              <CapaMidia
+                posterUrl={midia.posterUrl}
                 className="h-24 w-16 shrink-0 rounded-md border border-white/10 object-cover"
               />
 

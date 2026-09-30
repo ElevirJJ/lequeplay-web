@@ -11,7 +11,23 @@
     "notaMedia": 8.4,
     "totalAvaliacoes": 132,
     "diretor": "Marina Aleixo",
-    "duracaoMin": 118
+    "duracaoMin": 118,
+    "creditos": [
+      {
+        "pessoa": { "slug": "marina-aleixo", "nome": "Marina Aleixo" },
+        "papel": "direcao"
+      },
+      {
+        "pessoa": { "slug": "bia-nogueira", "nome": "Bia Nogueira" },
+        "papel": "elenco",
+        "personagem": "Lia"
+      },
+      {
+        "pessoa": { "slug": "raul-mendes", "nome": "Raul Mendes" },
+        "papel": "elenco",
+        "personagem": "Tomás"
+      }
+    ]
   },
   {
     "id": "2",
@@ -25,7 +41,23 @@
     "notaMedia": 7.9,
     "totalAvaliacoes": 208,
     "diretor": "Caio Bertoni",
-    "duracaoMin": 104
+    "duracaoMin": 104,
+    "creditos": [
+      {
+        "pessoa": { "slug": "caio-bertoni", "nome": "Caio Bertoni" },
+        "papel": "direcao"
+      },
+      {
+        "pessoa": { "slug": "lara-souza", "nome": "Lara Souza" },
+        "papel": "elenco",
+        "personagem": "Nina"
+      },
+      {
+        "pessoa": { "slug": "danilo-reis", "nome": "Danilo Reis" },
+        "papel": "elenco",
+        "personagem": "Otávio"
+      }
+    ]
   },
   {
     "id": "3",
@@ -38,8 +70,19 @@
     "posterUrl": "/capas/quintal-de-inverno.svg",
     "notaMedia": 0,
     "totalAvaliacoes": 0,
-    "diretor": "Lúcia Ferraz",
-    "duracaoMin": 96
+    "duracaoMin": 96,
+    "creditos": [
+      {
+        "pessoa": { "slug": "nara-lima", "nome": "Nara Lima" },
+        "papel": "elenco",
+        "personagem": "Helena"
+      },
+      {
+        "pessoa": { "slug": "joao-vaz", "nome": "João Vaz" },
+        "papel": "elenco",
+        "personagem": "Pedro"
+      }
+    ]
   },
   {
     "id": "4",
@@ -141,6 +184,7 @@
     "temporadas": [
       {
         "numero": 1,
+        "nome": "Temporada 1",
         "ano": 2023,
         "totalEpisodios": 4,
         "episodios": [
@@ -168,6 +212,7 @@
       },
       {
         "numero": 2,
+        "nome": "Temporada 2",
         "ano": 2024,
         "totalEpisodios": 3,
         "episodios": [
@@ -250,6 +295,53 @@
     ]
   },
   {
+    "id": "9",
+    "slug": "mapa-das-mares",
+    "tipo": "serie",
+    "titulo": "Mapa das Marés",
+    "ano": 2026,
+    "generos": ["Documentário", "Drama"],
+    "sinopse": "Quando uma vila costeira começa a desaparecer dos mapas oficiais, uma cartógrafa retorna à cidade onde cresceu para descobrir quem está redesenhando a linha do mar — e por quê.",
+    "posterUrl": "/capas/mapa-das-mares.svg",
+    "notaMedia": 8.7,
+    "totalAvaliacoes": 86,
+    "temporadas": [
+      {
+        "numero": 1,
+        "ano": 2026,
+        "totalEpisodios": 4,
+        "episodios": [
+          {
+            "numero": 1,
+            "titulo": "A linha que recuou",
+            "duracaoMin": 42
+          },
+          {
+            "numero": 2,
+            "titulo": "Nome de enseada",
+            "duracaoMin": 39
+          },
+          {
+            "numero": 3,
+            "titulo": "Terra de ninguém",
+            "duracaoMin": 44
+          },
+          {
+            "numero": 4,
+            "titulo": "O mar no papel",
+            "duracaoMin": 41
+          }
+        ]
+      },
+      {
+        "numero": 2,
+        "totalEpisodios": 0,
+        "episodios": []
+      }
+    ],
+    "status": "Returning Series"
+  },
+  {
     "id": "7",
     "slug": "revisao-de-codigo",
     "tipo": "podcast",
@@ -262,7 +354,55 @@
     "totalAvaliacoes": 512,
     "apresentador": "Rafa Okumura",
     "duracaoMin": 192,
-    "totalEpisodios": 3
+    "totalEpisodios": 6,
+    "frequencia": "Semanal",
+    "creditos": [
+      {
+        "pessoa": {
+          "slug": "rafa-okumura",
+          "nome": "Rafa Okumura"
+        },
+        "papel": "apresentacao"
+      }
+    ],
+    "episodios": [
+      {
+        "numero": 1,
+        "titulo": "O switch com 40 casos",
+        "duracaoMin": 30,
+        "publicadoEm": "2025-02-05"
+      },
+      {
+        "numero": 2,
+        "titulo": "Tratamento de erro que engole exceção",
+        "duracaoMin": 32,
+        "publicadoEm": "2025-02-12"
+      },
+      {
+        "numero": 3,
+        "titulo": "Variáveis de uma letra só",
+        "duracaoMin": 35,
+        "publicadoEm": "2025-02-19"
+      },
+      {
+        "numero": 4,
+        "titulo": "Herança com sete níveis",
+        "duracaoMin": 28,
+        "publicadoEm": "2025-02-26"
+      },
+      {
+        "numero": 5,
+        "titulo": "Testes que só testam mock",
+        "duracaoMin": 31,
+        "publicadoEm": "2025-03-05"
+      },
+      {
+        "numero": 6,
+        "titulo": "Refatorando código legado ao vivo",
+        "duracaoMin": 36,
+        "publicadoEm": "2025-03-12"
+      }
+    ]
   },
   {
     "id": "8",
@@ -276,6 +416,30 @@
     "totalAvaliacoes": 189,
     "apresentador": "Dandara Reis",
     "duracaoMin": 91,
-    "totalEpisodios": 2
+    "totalEpisodios": 2,
+    "frequencia": "Quinzenal",
+    "creditos": [
+      {
+        "pessoa": {
+          "slug": "dandara-reis",
+          "nome": "Dandara Reis"
+        },
+        "papel": "apresentacao"
+      }
+    ],
+    "episodios": [
+      {
+        "numero": 1,
+        "titulo": "De advogada a desenvolvedora",
+        "duracaoMin": 45,
+        "publicadoEm": "2025-01-15"
+      },
+      {
+        "numero": 2,
+        "titulo": "A coragem do recomeço",
+        "duracaoMin": 46,
+        "publicadoEm": "2025-01-29"
+      }
+    ]
   }
 ]
