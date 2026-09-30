@@ -17,6 +17,7 @@ e chama `revalidateTag`. Qual função usar numa Server Action — `updateTag`,
 | `listarMidias` | `GET /midias` | `midias` | a listagem do catálogo |
 | `buscarMidia` | `GET /midias/{slug}` | `midias`, `midia:<slug>` | o catálogo **e** aquela ficha |
 | `listarGeneros` | `GET /generos` | `generos` | a lista de gêneros |
+| `buscarNoCatalogo` | `GET /busca` | `midias` | as buscas guardadas, junto com o catálogo |
 | `listarHistorico` | `GET /perfil/historico` | nenhuma | nada: esta busca não é cacheada |
 
 As constantes estão em [`lib/cache-tags.ts`](../lib/cache-tags.ts). Não
