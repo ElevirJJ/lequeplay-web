@@ -542,8 +542,6 @@ export type ItemResultadoBusca = Midia & {
   rank: number;
 };
 
-export type ItemBusca = ItemResultadoBusca;
-
 /**
  * A resposta de `GET /v1/busca`.
  *
