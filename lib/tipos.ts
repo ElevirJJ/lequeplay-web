@@ -154,9 +154,15 @@ export type ResumoTemporada = {
   totalEpisodios: number;
 };
 
-/** A temporada inteira: o resumo mais os episódios, em ordem de exibição. */
+/** A temporada: o resumo, mais os episódios quando alguém os tiver. */
 export type Temporada = ResumoTemporada & {
-  episodios: Episodio[];
+  /**
+   * Opcional porque a API publicada **não manda**: o schema `Temporada` do
+   * `openapi.yaml` tem só `numero`, `nome`, `ano` e `totalEpisodios`, e a
+   * chave nem aparece na resposta. Só o mock traz a lista. Quem mostra usa
+   * `temporada.episodios ?? []` e cai no estado vazio (LP-306).
+   */
+  episodios?: Episodio[];
 };
 
 export type Serie = MidiaBase & {
